@@ -1,5 +1,5 @@
 {
-  "name": "docker-composer-manager",
+  "name": "docker-manager",
   "version": "0.0.2",
   "description": "Module to manage dockers containers based on docker-compose",
   "main": "index.js",
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dani8art/docker-manager-npm.git"
+    "url": "git+https://github.com/socialtables/docker-manager.git"
   },
   "bugs": {
-    "url": "https://github.com/dani8art/docker-manager-npm/issues"
+    "url": "https://github.com/socialtables/docker-manager/issues"
   },
   "keywords": [
     "docker",
     "docker-compose",
     "manager"
   ],
-  "author": "Daniel Arteaga",
-  "license": "ISC"
+  "author": "Social Tables",
+  "license": "Apache-2.0"
 }
