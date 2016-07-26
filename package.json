@@ -1,6 +1,6 @@
 {
   "name": "docker-manager",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "A module to set manage docker containers - specifically focusing on running docker compose as a testing harness",
   "main": "index.js",
   "scripts": {
