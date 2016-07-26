@@ -1,41 +1,51 @@
-var child_process = require('child_process');
+"use strict";
+var debug = require("debug");
 
-exports.dockerComposeUp = function(dir, options, success, error){
-	var command = 'docker-compose up';
+var child_process = require("child_process");
 
-	if(options){
+const composeCmd = "docker-compose";
+exports.composeUp = function(dir, options){
+	var args = ["up", "--force-recreate"];
+	var opts = { cwd: dir };
+	/*if(options){
 		command += ' ' + options;
-	}
+	}*/
+	return new Promise((resolve, reject) => {
+		var proc = child_process.spawn(composeCmd, args, opts);
+		var output = [];
+		proc.stdout.on('data', (data) => {
+		  debug(`stdout: ${data}`);
+		  output.push(data);
+		});
 
-	execCommand(command, success, error, {cwd: dir});
+		proc.stderr.on('data', (data) => {
+		  debug(`stderr: ${data}`);
+		  output.push(data);
+		});
+
+		proc.on("close", (code) => {
+  			debug("Caught close command with code: ", code);
+  			if (code != 0) {
+  				reject(`docker-compose -up command shutdown prematurely: ${output}`);
+  			}
+		});
+
+		setInterval(function() {
+			resolve("Everything is good.");
+		}, 10000);
+	});
 }
 
-exports.dockerComposeDown = function(dir, options, success, error){
-	var command = 'docker-compose down';
-
-	if(options){
+exports.composeDown = function(dir, options){
+	var cmd = "docker-compose down";
+	/*if(options){
 		command += ' ' + options;
-	} 
+	}*/
 	
-	execCommand(command, success, error, {cwd: dir});
-
+	return execCommand(cmd, { cwd: dir });
 }
 
-exports.dockerComposeStop = function(dir, success, error){
-	var command = 'docker-compose stop';
-
-	execCommand(command, success, error, {cwd: dir});
-
-}
-
-exports.dockerComposeStart = function(dir, success, error){
-	var command = 'docker-compose start';
-
-	execCommand(command, success, error, {cwd: dir});
-
-}
-
-exports.dockerExec = function (container, exec_command, options, success, error){
+/*exports.dockerExec = function (container, exec_command, options, success, error){
 	var command = 'docker exec';
 
 	if(options){
@@ -62,18 +72,24 @@ exports.dockerInspectPortOfContainer = function (container, options){
 	var command = "docker inspect --format '{{.NetworkSettings.Ports}}' " + container;
 
 	return child_process.execSync(command).toString('utf-8').replace(/(?:\r\n|\r|\n)/g, '').split("[")[1].split("/")[0];
+}*/
+
+function execCommand(command, options) {
+	return new Promise((resolve, reject) => {
+		child_process.exec(command, options, (err, stdout, stderr) => {
+			if(!err) {
+				resolve({ 
+					"stdout": stdout, 
+					"stderr": stderr
+				});
+			} 
+			else {
+				reject(err);
+			}
+		});			
+	});
 }
 
-function execCommand(command, success, error, options){
-
-	child_process.exec(command, options, function(err, stdout, stderr){
-		if(!err){
-			if(success)
-				success(stdout, stderr);
-		}else{
-			if(error)
-				error(err, stderr);	
-		}					
-	});
-
+function spawnCommand(cmd, args, options) {
+	
 }
