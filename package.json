@@ -1,7 +1,7 @@
 {
   "name": "docker-manager",
   "version": "1.0.0",
-  "description": "A module to set manage docker containers - specifically focusing on running docker compose as a testing harness",
+  "description": "A module to manage docker containers - specifically focusing on running docker compose as a testing harness",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
