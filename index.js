@@ -32,7 +32,7 @@ exports.composeUp = function(dir, options){
 
 		setInterval(function() {
 			resolve("Everything is good.");
-		}, 20000);
+		}, 10000);
 	});
 }
 
