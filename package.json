@@ -21,6 +21,8 @@
   "author": "Social Tables",
   "license": "Apache-2.0",
   "dependencies": {
+    "bluebird": "^3.4.1",
+    "bluebird-retry": "^0.8.0",
     "debug": "^2.2.0"
   }
 }

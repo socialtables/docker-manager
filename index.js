@@ -1,39 +1,42 @@
 "use strict";
 var debug = require("debug");
 
+var Promise = require("bluebird");
+var retry = require("bluebird-retry");
+
 var child_process = require("child_process");
 
 const composeCmd = "docker-compose";
-exports.composeUp = function(dir, options){
-	var args = ["up", "--force-recreate"];
+exports.composeUp = function(dir, options, health){
+	var args = ["up"];
 	var opts = { cwd: dir };
-	/*if(options){
-		command += ' ' + options;
-	}*/
-	return new Promise((resolve, reject) => {
-		var proc = child_process.spawn(composeCmd, args, opts);
-		var output = [];
-		proc.stdout.on('data', (data) => {
-		  debug(`stdout: ${data}`);
-		  output.push(data);
-		});
-
-		proc.stderr.on('data', (data) => {
-		  debug(`stderr: ${data}`);
-		  output.push(data);
-		});
-
-		proc.on("close", (code) => {
-  			debug("Caught close command with code: ", code);
-  			if (code != 0) {
-  				reject(`docker-compose -up command shutdown prematurely: ${output}`);
-  			}
-		});
-
-		setInterval(function() {
-			resolve("Everything is good.");
-		}, 20000);
+	if (options.force_recreate) {
+		args.push("--force-recreate");
+	}
+	var proc = child_process.spawn(composeCmd, args, opts);
+	var output = [];
+	proc.stdout.on('data', (data) => {
+	  debug(`stdout: ${data.toString()}`);
+	  output.push(data.toString());
 	});
+
+	proc.stderr.on('data', (data) => {
+	  debug(`stderr: ${data.toString()}`);
+	  output.push(data.toString());
+	});
+
+	proc.on("close", (code) => {
+			debug("Caught close command with code: ", code);
+			if (code != 0) {
+				reject(`docker-compose -up command shutdown prematurely: ${output}`);
+			}
+	});
+
+	return retry(health.check, { timeout: health.to, interval: 1000, backoff: 1 })
+		.catch(err => {
+			console.log(output);
+			console.log(err);
+		});
 }
 
 exports.composeDown = function(dir, options){
@@ -88,8 +91,4 @@ function execCommand(command, options) {
 			}
 		});			
 	});
-}
-
-function spawnCommand(cmd, args, options) {
-	
 }
