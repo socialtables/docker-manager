@@ -1,10 +1,10 @@
 "use strict";
-var debug = require("debug");
+const debug = require("debug");
+const Promise = require("bluebird");
+const retry = require("bluebird-retry");
+const child_process = require("child_process");
 
-var Promise = require("bluebird");
-var retry = require("bluebird-retry");
-
-var child_process = require("child_process");
+const implicitHealth = require("./lib/implicit-health");
 
 const composeCmd = "docker-compose";
 exports.composeUp = function(dir, options, health){
@@ -28,15 +28,20 @@ exports.composeUp = function(dir, options, health){
 	proc.on("close", (code) => {
 			debug("Caught close command with code: ", code);
 			if (code != 0) {
-				reject(`docker-compose -up command shutdown prematurely: ${output}`);
+				throw new Error(`docker-compose -up command shutdown prematurely: ${output}`);
 			}
 	});
-
-	return retry(health.check, { timeout: health.to, interval: 1000, backoff: 1 })
-		.catch(err => {
-			console.log(output);
-			console.log(err);
-		});
+	
+	if (health.check) {
+		return retry(health.check, { timeout: health.to, interval: 1000, backoff: 1 });
+	}
+	else {
+		// A health check function was no defined, so switch to trying the docker inferred method
+		const dockerHealth = () => {
+			return implicitHealth(dir);
+		};
+		return retry(dockerHealth, { timeout: health.to, interval: 1000, backoff: 1 });
+	}
 }
 
 exports.composeDown = function(dir, options){
@@ -47,35 +52,6 @@ exports.composeDown = function(dir, options){
 	
 	return execCommand(cmd, { cwd: dir });
 }
-
-/*exports.dockerExec = function (container, exec_command, options, success, error){
-	var command = 'docker exec';
-
-	if(options){
-		for(option in options){
-			command += ' ' + options[option];
-		}
-	}
-
-	command += ' ' + container;
-
-	command += ' ' + exec_command;
-
-	execCommand(command, success, error);
-
-}
-
-exports.dockerInspectIPAddressOfContainer = function (container, options){
-	var command = "docker inspect --format '{{.NetworkSettings.Networks." + options.network + ".IPAddress}}' " + container;
-
-	return child_process.execSync(command).toString('utf-8').replace(/(?:\r\n|\r|\n)/g, '');
-}
-
-exports.dockerInspectPortOfContainer = function (container, options){
-	var command = "docker inspect --format '{{.NetworkSettings.Ports}}' " + container;
-
-	return child_process.execSync(command).toString('utf-8').replace(/(?:\r\n|\r|\n)/g, '').split("[")[1].split("/")[0];
-}*/
 
 function execCommand(command, options) {
 	return new Promise((resolve, reject) => {

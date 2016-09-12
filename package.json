@@ -1,5 +1,5 @@
 {
-  "name": "docker-manager",
+  "name": "@socialtables/docker-manager",
   "version": "1.1.0",
   "description": "A module to manage docker containers - specifically focusing on running docker compose as a testing harness",
   "main": "index.js",
@@ -23,6 +23,9 @@
   "dependencies": {
     "bluebird": "^3.4.1",
     "bluebird-retry": "^0.8.0",
-    "debug": "^2.2.0"
+    "debug": "^2.2.0",
+    "node-yaml": "^3.0.0",
+    "request": "^2.74.0",
+    "request-promise": "^4.1.1"
   }
 }
