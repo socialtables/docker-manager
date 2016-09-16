@@ -38,7 +38,7 @@ after(function() {
 
 # Usage
 
-dockerManager.composeUp(directory, options, health)
+```dockerManager.composeUp(directory, options, health)```
 
 where: 
 
