@@ -8,7 +8,7 @@ $ npm install @socialtables/docker-manager
 
 # Purpose
 
-Specifically can be used whenever you want to run docker compose and wait for it to be up, but specifically designed to be used as an integration test harness in combination with mocha.
+Can be used whenever you want to run docker compose and wait for it to be up, but specifically designed to be used as an integration test harness in combination with mocha.
 
 # simple example
 
@@ -35,6 +35,8 @@ after(function() {
         });
 });
 ```
+
+# Usage
 
 dockerManager.composeUp(directory, options, health)
 
