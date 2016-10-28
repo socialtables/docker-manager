@@ -1,6 +1,6 @@
 {
   "name": "@socialtables/docker-manager",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A module to manage docker containers - specifically focusing on running docker compose as a testing harness",
   "main": "index.js",
   "scripts": {
